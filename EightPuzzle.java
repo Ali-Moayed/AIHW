@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -6,50 +7,160 @@ public class EightPuzzle {
 	
 	public static void main(String[] args){
 		int solved = 0;
-		HillClimbingSearchAgent[] agents = new HillClimbingSearchAgent[100];
-//		//p1 = Goal
-//		Problem p1 = new Problem(new int[][]{
-//			  { 1, 2, 3 },
-//			  { 4, 0, 6 },
-//			  { 7, 8, 9 }
-//			});
-//		agents[0] = new HillClimbingSearchAgent(p1);
-//		
-//		Problem p2 = new Problem(new int[][]{
-//			  { 1, 0, 2 },
-//			  { 4, 8, 3 },
-//			  { 7, 9, 6 }
-//			});
-//		agents[1] = new HillClimbingSearchAgent(p2);
-
-		for (int i = 0; i < 100; i++) {
-			agents[i] = new HillClimbingSearchAgent(new Problem(randomData()));
-		}
+		SimulatedAnnealingSearchAgent[] agents = new SimulatedAnnealingSearchAgent[12];
+		//p1 = Goal
+		Problem p1 = new Problem(new int[][]{
+			  { 1, 2, 3 },
+			  { 4, 0, 6 },
+			  { 7, 8, 9 }
+			});
+		agents[0] = new SimulatedAnnealingSearchAgent(p1);
 		
-		for (HillClimbingSearchAgent agent : agents) {
-			try{
-				long time = System.currentTimeMillis();
-				SearchNode sn = agent.solve();
-				time = System.currentTimeMillis() - time;
-				sn.time = time;
-				if(sn.isGoal())
-					solved++;
-				
-				PrintResult(sn);
-			}catch (Exception e) {
-				// TODO: handle exception
-			}
+		Problem p2 = new Problem(new int[][]{
+			  { 1, 0, 2 },
+			  { 4, 8, 3 },
+			  { 7, 9, 6 }
+			});
+		agents[1] = new SimulatedAnnealingSearchAgent(p2);
+		
+		Problem p3 = new Problem(new int[][]{
+			  { 0, 7, 9 },
+			  { 6, 4, 3 },
+			  { 8, 1, 2 }
+			});
+		agents[2] = new SimulatedAnnealingSearchAgent(p3);
+		
+		Problem p4 = new Problem(new int[][]{
+			  { 0, 9, 4 },
+			  { 8, 1, 6 },
+			  { 3, 2, 7 }
+			});
+		agents[3] = new SimulatedAnnealingSearchAgent(p4);
+		
+		Problem p5 = new Problem(new int[][]{
+			  { 3, 2, 9 },
+			  { 0, 6, 1 },
+			  { 7, 8, 4 }
+			});
+		agents[4] = new SimulatedAnnealingSearchAgent(p5);
+		
+		Problem p6 = new Problem(new int[][]{
+			  { 7, 8, 6 },
+			  { 0, 2, 4 },
+			  { 3, 1, 9 }
+			});
+		agents[5] = new SimulatedAnnealingSearchAgent(p6);
+		
+		Problem p7 = new Problem(new int[][]{
+			  { 7, 8, 0 },
+			  { 4, 2, 1 },
+			  { 9, 3, 6 }
+			});
+		agents[6] = new SimulatedAnnealingSearchAgent(p7);
+		
+		Problem p8 = new Problem(new int[][]{
+			  { 2, 4, 6 },
+			  { 0, 1, 9 },
+			  { 3, 7, 8 }
+			});
+		agents[7] = new SimulatedAnnealingSearchAgent(p8);
+		
+		Problem p9 = new Problem(new int[][]{
+			  { 4, 9, 1 },
+			  { 6, 2, 7 },
+			  { 3, 0, 8 }
+			});
+		agents[8] = new SimulatedAnnealingSearchAgent(p9);
+		
+		Problem p10 = new Problem(new int[][]{
+			  { 6, 7, 9 },
+			  { 3, 0, 8 },
+			  { 1, 2, 4 }
+			});
+		agents[9] = new SimulatedAnnealingSearchAgent(p10);
+		
+		Problem p11 = new Problem(new int[][]{
+			  { 8, 9, 7 },
+			  { 3, 4, 2 },
+			  { 1, 0, 6 }
+			});
+		agents[10] = new SimulatedAnnealingSearchAgent(p11);
+		
+		Problem p12 = new Problem(new int[][]{
+			  { 8, 3, 1 },
+			  { 4, 9, 0 },
+			  { 6, 7, 2 }
+			});
+		agents[11] = new SimulatedAnnealingSearchAgent(p12);
+		
+//		for (int i = 0; i < 20; i++) {
+//			agents[i] = new SimulatedAnnealingSearchAgent(new Problem(randomData()));
+//		}
+		
+		for (SimulatedAnnealingSearchAgent agent : agents) {
+			long time = System.currentTimeMillis();
+			SearchNode sn = agent.solve();
+			time = System.currentTimeMillis() - time;
+			sn.time = time;
+			if(sn.isGoal())
+				solved++;
+			
+			PrintResult(sn);
 		}
-//		System.out.print(isSolvable(p3.data));
-		System.out.print("Success rate:\t" + (float)solved/100);
+
+		System.out.print("Success rate:\t" + (float)solved/agents.length + "\t(" + solved + "/" + agents.length + ")");
 	}
 	
 	public static void PrintResult(SearchNode sn){
-		System.out.println("Time spent in millis:\t" + sn.time);
+		System.out.println("Time spent in milliseconds:\t" + sn.time);
 		
+//		Removing returns
 		sn.moves.poll();
-		System.out.println("Moves:\t" + sn.moves.toString());
-		System.out.println("MovesCount(cost):\t" + sn.moves.size());
+		List<Problem.move> movesList = new ArrayList<>(sn.moves);
+		movesList.remove(Problem.move.Stay);
+		boolean changed = true;
+		while (changed) {
+			movesList.removeAll(Collections.singleton(Problem.move.Stay));
+			changed = false;
+			for (int j = 0; j < movesList.size() - 2; j++) {
+				switch (movesList.get(j)) {
+				case Left:
+					if(movesList.get(j+1) == Problem.move.Right){
+						movesList.set(j, Problem.move.Stay);
+						movesList.set(j+1, Problem.move.Stay);
+						changed = true;
+					}
+					break;
+				case Right:
+					if(movesList.get(j+1) == Problem.move.Left){
+						movesList.set(j, Problem.move.Stay);
+						movesList.set(j+1, Problem.move.Stay);
+						changed = true;
+					}
+					break;
+				case Up:
+					if(movesList.get(j+1) == Problem.move.Down){
+						movesList.set(j, Problem.move.Stay);
+						movesList.set(j+1, Problem.move.Stay);
+						changed = true;
+					}
+					break;
+				case Down:
+					if(movesList.get(j+1) == Problem.move.Up){
+						movesList.set(j, Problem.move.Stay);
+						movesList.set(j+1, Problem.move.Stay);
+						changed = true;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		
+		System.out.println("Moves:\t" + movesList.toString());
+		System.out.println("MovesCount(maximum number of states):\t" + movesList.size() + " / 181,440");
+		System.out.println("cost:\t" + sn.cost);
 		
 		System.out.println("Solution " + (sn.isGoal()?"":"not ") + "found!");
 

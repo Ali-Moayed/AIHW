@@ -2,19 +2,23 @@ import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 
-public class HillClimbingSearchAgent {
+public class SimulatedAnnealingSearchAgent {
 	int count;
+	int depthLimit = 1000;
 	
 	Problem problem;
 	SearchNode firstNode;
 	SearchNode finalNode;
+	SearchNode peekNode;
 	Queue<SearchNode> nextNodes = new PriorityQueue<>(new NodeComparator());
 
-	public HillClimbingSearchAgent(Problem problem){
+	public SimulatedAnnealingSearchAgent(Problem problem){
 		firstNode = new SearchNode(problem.data, problem.data, new ArrayDeque<>() , 0,false);
 		firstNode.moves.add(Problem.move.Stay);
 		finalNode = firstNode;
+		peekNode = firstNode;
 		this.problem = problem;
 		
 		count = 0;
@@ -23,9 +27,12 @@ public class HillClimbingSearchAgent {
 	public SearchNode solve(){
 		nextNodes.clear();
 		count++;
-		if (finalNode.isPeek || finalNode.isGoal() || count > 100){
-			return finalNode;
+		if (finalNode.isGoal() || count > depthLimit){
+			return (finalNode.getH() < peekNode.getH())? finalNode:peekNode;
 		}else{
+			if(finalNode.isPeek && (finalNode.getH() < peekNode.getH())){
+				peekNode = new SearchNode(finalNode);
+			}
 			Problem.move[] nextMoves = problem.getNextMoves();
 			int[] Zpos = problem.getZIndex();
 			int[][] cData = new int[3][3];
@@ -94,10 +101,45 @@ public class HillClimbingSearchAgent {
 				}
 			}
 
+			if(nextNodes.peek().getH() >= peekNode.getH()){
+				int sumOfH = 5;
+				int[] chances = new int[nextNodes.size()];
+				int x = 0;
+				for (SearchNode n : nextNodes) {
+					sumOfH += n.getH();
+					chances[x++] = n.getH();
+				}
+				for (int i = 0; i < chances.length; i++) {
+					chances[i] = sumOfH - chances[i];
+				}
+				
+				int min = chances[chances.length - 1];
+				for (int i = 0; i < chances.length; i++) {
+					int dif = chances[i] - min;
+					chances[i] += 10*dif*dif;
+					if(i>0)
+						chances[i] += chances[i-1];
+				}
+				
+				Random r = new Random();
+				int rc = r.nextInt(chances[chances.length - 1]);
+				x = 0;
+				
+				for (int i = 0; i < chances.length; i++) {
+					if(chances[i] > rc){
+						x = i;
+						break;
+					}
+				}
+				
+				for (int i = 0; i < x; i++) {
+					nextNodes.poll();
+				}
+			}
 			finalNode = nextNodes.poll();
 			assignData(problem.data, finalNode.data);
 			return solve();
-		}	
+		}
 	}
 	
 	class NodeComparator implements Comparator<SearchNode>{ 
