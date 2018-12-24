@@ -6,22 +6,29 @@ import java.util.Random;
 
 public class SimulatedAnnealingSearchAgent {
 	int count;
-	int depthLimit = 1000;
+	int depthLimit;
 	
 	Problem problem;
 	SearchNode firstNode;
 	SearchNode finalNode;
 	SearchNode peekNode;
 	Queue<SearchNode> nextNodes = new PriorityQueue<>(new NodeComparator());
-
+	
 	public SimulatedAnnealingSearchAgent(Problem problem){
 		firstNode = new SearchNode(problem.data, problem.data, new ArrayDeque<>() , 0,false);
 		firstNode.moves.add(Problem.move.Stay);
 		finalNode = firstNode;
-		peekNode = firstNode;
-		this.problem = problem;
+		peekNode = new SearchNode(finalNode);
+		this.problem = new Problem(problem);
 		
 		count = 0;
+		
+		depthLimit = 1000;
+	}
+	
+	public SimulatedAnnealingSearchAgent(Problem problem, int depthLimit){
+		this(problem);
+		this.depthLimit = depthLimit;
 	}
 	
 	public SearchNode solve(){
@@ -148,6 +155,10 @@ public class SimulatedAnnealingSearchAgent {
                 return 1; 
             else if (s1.getH() < s2.getH()) 
                 return -1; 
+            else if (s1.moves.size() > s2.moves.size())
+            	return 1;
+            else if (s1.moves.size() < s2.moves.size())
+            	return -1;
             return 0; 
         } 
     } 

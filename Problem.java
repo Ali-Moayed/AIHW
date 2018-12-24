@@ -16,6 +16,11 @@ public class Problem {
 		data = initial;
 	}
 	
+	public Problem(Problem p) {
+		assignData(this.initial, p.initial);
+		assignData(this.data, p.initial);
+	}
+	
 	public int[] getZIndex(){
 
 		for (int i = 0 ; i < 3; i++)
@@ -30,5 +35,13 @@ public class Problem {
 	public move[] getNextMoves(){
 		int[] pos = getZIndex();
 		return nexts[pos[0]][pos[1]];
+	}
+	
+	public void assignData(int[][] a,int[][] b){
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				a[i][j] = b[i][j];
+			}
+		}
 	}
 }

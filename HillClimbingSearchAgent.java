@@ -106,6 +106,10 @@ public class HillClimbingSearchAgent {
                 return 1; 
             else if (s1.getH() < s2.getH()) 
                 return -1; 
+            else if (s1.moves.size() > s2.moves.size())
+            	return 1;
+            else if (s1.moves.size() < s2.moves.size())
+            	return -1;
             return 0; 
         } 
     } 
