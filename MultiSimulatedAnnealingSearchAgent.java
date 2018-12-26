@@ -5,6 +5,8 @@ import java.util.Queue;
 
 public class MultiSimulatedAnnealingSearchAgent {
 	
+	int cost;
+	
 	Problem problem;
 	List<SimulatedAnnealingSearchAgent> agents = new ArrayList<>();
 	int numberOfAgents;
@@ -17,28 +19,34 @@ public class MultiSimulatedAnnealingSearchAgent {
 	public MultiSimulatedAnnealingSearchAgent(Problem problem, int num){
 		this.problem = problem;
 		numberOfAgents = num;
+		cost = 0;
 		
 		firstNode = new SearchNode(problem.data, problem.data, new ArrayDeque<>() , 0,false);
 		finalNode = new SearchNode(firstNode);
 	}
 	
 	public SearchNode solve(){
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 10 && !finalNode.isGoal(); i++) {
 			agents.clear();
 			for (int j = 0; j < numberOfAgents; j++) 
 				agents.add(new SimulatedAnnealingSearchAgent(new Problem(finalNode.data), 100));
 			for (SimulatedAnnealingSearchAgent agent : agents) {
 				SearchNode sn = agent.solve();
+				
+				int nCost = sn.cost + finalNode.cost;
 				if (isBetter(sn, finalNode))
 					finalNode = sn;
+				finalNode.cost = nCost;
 			}
 
 			for (Problem.move move : finalNode.moves) {
 				moves.add(move);
-			}			
+			}
+			cost += finalNode.cost;
 		}
 		finalNode.moves = this.moves;
 		finalNode.startData = firstNode.data;
+		finalNode.cost = cost;
 		return finalNode;
 	}
 	

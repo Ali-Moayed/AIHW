@@ -7,18 +7,19 @@ public class EightPuzzle {
 	
 	public static void main(String[] args){
 		int solved = 0;
+		float totalTime = 0;
 		MultiSimulatedAnnealingSearchAgent[] agents = new MultiSimulatedAnnealingSearchAgent[12];
-		//p1 = Goal
+
 		Problem p1 = new Problem(new int[][]{
-			  { 1, 2, 3 },
-			  { 4, 0, 6 },
-			  { 7, 8, 9 }
-			});
-		
-		Problem p2 = new Problem(new int[][]{
 			  { 1, 0, 2 },
 			  { 4, 8, 3 },
 			  { 7, 9, 6 }
+			});
+		
+		Problem p2 = new Problem(new int[][]{
+			  { 8, 2, 6 },
+			  { 0, 3, 4 },
+			  { 1, 7, 9 }
 			});
 		
 		Problem p3 = new Problem(new int[][]{
@@ -81,21 +82,21 @@ public class EightPuzzle {
 			  { 6, 7, 2 }
 			});
 		
-		agents[0] = new MultiSimulatedAnnealingSearchAgent(p1, 10);
-		agents[1] = new MultiSimulatedAnnealingSearchAgent(p2, 10);
-		agents[2] = new MultiSimulatedAnnealingSearchAgent(p3, 10);
-		agents[3] = new MultiSimulatedAnnealingSearchAgent(p4, 10);
-		agents[4] = new MultiSimulatedAnnealingSearchAgent(p5, 10);
-		agents[5] = new MultiSimulatedAnnealingSearchAgent(p6, 10);
-		agents[6] = new MultiSimulatedAnnealingSearchAgent(p7, 10);
-		agents[7] = new MultiSimulatedAnnealingSearchAgent(p8, 10);
-		agents[8] = new MultiSimulatedAnnealingSearchAgent(p9, 10);
-		agents[9] = new MultiSimulatedAnnealingSearchAgent(p10, 10);
-		agents[10] = new MultiSimulatedAnnealingSearchAgent(p11, 10);
-		agents[11] = new MultiSimulatedAnnealingSearchAgent(p12, 10);
+		agents[0] = new MultiSimulatedAnnealingSearchAgent(p1,10);
+		agents[1] = new MultiSimulatedAnnealingSearchAgent(p2,10);
+		agents[2] = new MultiSimulatedAnnealingSearchAgent(p3,10);
+		agents[3] = new MultiSimulatedAnnealingSearchAgent(p4,10);
+		agents[4] = new MultiSimulatedAnnealingSearchAgent(p5,10);
+		agents[5] = new MultiSimulatedAnnealingSearchAgent(p6,10);
+		agents[6] = new MultiSimulatedAnnealingSearchAgent(p7,10);
+		agents[7] = new MultiSimulatedAnnealingSearchAgent(p8,10);
+		agents[8] = new MultiSimulatedAnnealingSearchAgent(p9,10);
+		agents[9] = new MultiSimulatedAnnealingSearchAgent(p10,10);
+		agents[10] = new MultiSimulatedAnnealingSearchAgent(p11,10);
+		agents[11] = new MultiSimulatedAnnealingSearchAgent(p12,10);
 		
 //		for (int i = 0; i < 20; i++) {
-//			agents[i] = new SimulatedAnnealingSearchAgent(new Problem(randomData()));
+//			agents[i] = new MultiSimulatedAnnealingSearchAgent(new Problem(randomData()));
 //		}
 		
 		for (MultiSimulatedAnnealingSearchAgent agent : agents) {
@@ -103,13 +104,15 @@ public class EightPuzzle {
 			SearchNode sn = agent.solve();
 			time = System.currentTimeMillis() - time;
 			sn.time = time;
+			totalTime += time;
 			if(sn.isGoal())
 				solved++;
 			
 			PrintResult(sn);
 		}
 
-		System.out.print("Success rate:\t" + (float)solved/agents.length + "\t(" + solved + "/" + agents.length + ")");
+		System.out.println("Success rate:\t" + (float)solved/agents.length + "\t(" + solved + "/" + agents.length + ")");
+		System.out.print("Total time:\t" + totalTime);
 	}
 	
 	public static void PrintResult(SearchNode sn){
@@ -163,7 +166,7 @@ public class EightPuzzle {
 		System.out.println("MovesCount(estimated number of states):\t" + movesList.size() + " / 181,440");
 		System.out.println("cost:\t" + sn.cost);
 		
-		System.out.println("Solution " + (sn.isGoal()?"":"not ") + "found!");
+		System.out.println("\n===> Solution " + (sn.isGoal()?"":"not ") + "found!");
 
 		System.out.println("\nStart state:");
 		PrintData(sn.startData);
